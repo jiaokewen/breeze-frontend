@@ -13,7 +13,7 @@ import { setToken, getToken } from '@/libs/util'
 
 export default {
   state: {
-    userName: '',
+    username: '',
     userId: '',
     avatarImgPath: '',
     token: getToken(),
@@ -33,7 +33,7 @@ export default {
       state.userId = id
     },
     setUserName (state, name) {
-      state.userName = name
+      state.username = name
     },
     setAccess (state, access) {
       state.access = access
@@ -74,16 +74,15 @@ export default {
   },
   actions: {
     // 登录
-    handleLogin ({ commit }, { userName, password }) {
-      userName = userName.trim()
+    handleLogin ({ commit }, { username, password }) {
+      username = username.trim()
       return new Promise((resolve, reject) => {
         login({
-          userName,
+          username,
           password
         }).then(res => {
-          const data = res.data
-          commit('setToken', data.token)
-          resolve()
+          // commit('setToken', data)
+          resolve(res)
         }).catch(err => {
           reject(err)
         })
@@ -105,17 +104,18 @@ export default {
         // resolve()
       })
     },
-    // 获取用户相关信息
+
     getUserInfo ({ state, commit }) {
       return new Promise((resolve, reject) => {
         try {
           getUserInfo(state.token).then(res => {
             const data = res.data
-            commit('setAvatar', data.avatar)
-            commit('setUserName', data.name)
-            commit('setUserId', data.user_id)
-            commit('setAccess', data.access)
+            commit('setAvatar', 'https://avatars3.githubusercontent.com/u/31264070?s=400&u=79559505169ca8d39eda5d219e6dc770535d462c&v=4')
+            commit('setUserName', data.nickName)
+            commit('setUserId', data.userId)
+            commit('setAccess', ['super_admin', 'admin'])
             commit('setHasGetInfo', true)
+            data.access = ['super_admin', 'admin']
             resolve(data)
           }).catch(err => {
             reject(err)
@@ -124,6 +124,15 @@ export default {
           reject(error)
         }
       })
+    },
+    // 获取用户相关信息
+    setUserInfo ({ state, commit }, { res }) {
+      const data = res.data
+      commit('setAvatar', 'https://avatars3.githubusercontent.com/u/31264070?s=400&u=79559505169ca8d39eda5d219e6dc770535d462c&v=4')
+      commit('setUserName', data.nickName)
+      commit('setUserId', data.userId)
+      commit('setAccess', ['super_admin', 'admin'])
+      commit('setHasGetInfo', true)
     },
     // 此方法用来获取未读消息条数，接口只返回数值，不返回消息列表
     getUnreadMessageCount ({ state, commit }) {

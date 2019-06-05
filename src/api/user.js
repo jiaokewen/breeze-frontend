@@ -1,31 +1,32 @@
 import axios from '@/libs/api.request'
+import qs from 'qs'
 
-export const login = ({ userName, password }) => {
+export const login = ({ username, password }) => {
   const data = {
-    userName,
+    username,
     password
   }
   return axios.request({
-    url: 'login',
-    data,
-    method: 'post'
+    url: '/auth/login',
+    data: qs.stringify(data),
+    method: 'post',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded'
+    }
   })
 }
 
-export const getUserInfo = (token) => {
+export const getUserInfo = () => {
   return axios.request({
-    url: 'get_info',
-    params: {
-      token
-    },
+    url: '/auth/sysUser/userInfo',
     method: 'get'
   })
 }
 
 export const logout = (token) => {
   return axios.request({
-    url: 'logout',
-    method: 'post'
+    url: '/auth/sysUser/logout',
+    method: 'get'
   })
 }
 

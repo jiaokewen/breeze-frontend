@@ -18,6 +18,8 @@
 <script>
 import LoginForm from '_c/login-form'
 import { mapActions } from 'vuex'
+import { setToken } from '@/libs/util'
+
 export default {
   components: {
     LoginForm
@@ -25,15 +27,20 @@ export default {
   methods: {
     ...mapActions([
       'handleLogin',
-      'getUserInfo'
+      'getUserInfo',
+      'setUserInfo'
     ]),
-    handleSubmit ({ userName, password }) {
-      this.handleLogin({ userName, password }).then(res => {
-        this.getUserInfo().then(res => {
+    handleSubmit ({ username, password }) {
+      this.handleLogin({ username, password }).then(res => {
+        if (res.success) {
+          setToken(res.data.nickName)
+          this.setUserInfo({ res })
           this.$router.push({
             name: this.$config.homeName
           })
-        })
+        } else {
+          this.$Message.warning('用户名或密码错误')
+        }
       })
     }
   }
