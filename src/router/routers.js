@@ -61,7 +61,7 @@ export default [
   },
   {
     path: '/join',
-    name: 'join',
+    name: 'join_page',
     component: Main,
     meta: {
       hideInBread: true
@@ -464,12 +464,12 @@ export default [
     ]
   },
   {
-    path: '/401',
-    name: 'error_401',
+    path: '/403',
+    name: 'error_403',
     meta: {
       hideInMenu: true
     },
-    component: () => import('@/view/error-page/401.vue')
+    component: () => import('@/view/error-page/403.vue')
   },
   {
     path: '/500',

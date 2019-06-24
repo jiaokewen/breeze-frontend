@@ -87,7 +87,9 @@ export default {
       return list
     },
     menuList () {
-      return this.$store.getters.menuList
+      console.log(this.$store.state.user.menuCodeList)
+      let menu = this.filterMenu(this.$store.getters.menuList, this.$store.state.user.menuCodeList)
+      return menu
     },
     local () {
       return this.$store.state.app.local
@@ -112,6 +114,17 @@ export default {
       'handleLogin',
       'getUnreadMessageCount'
     ]),
+    filterMenu (menuList, menuCode) {
+      return menuList.filter(item => {
+        return menuCode.indexOf(item.name) > -1
+      }).map(item => {
+        item = Object.assign({}, item)
+        if (item.children) {
+          item.children = this.filterMenu(item.children, menuCode)
+        }
+        return item
+      })
+    },
     turnToPage (route) {
       let { name, params, query } = {}
       if (typeof route === 'string') name = route

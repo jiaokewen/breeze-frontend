@@ -23,7 +23,8 @@ export default {
     messageUnreadList: [],
     messageReadedList: [],
     messageTrashList: [],
-    messageContentStore: {}
+    messageContentStore: {},
+    menuCodeList: []
   },
   mutations: {
     setAvatar (state, avatarPath) {
@@ -65,6 +66,9 @@ export default {
       const msgItem = state[from].splice(index, 1)[0]
       msgItem.loading = false
       state[to].unshift(msgItem)
+    },
+    setMenuCode (state, list) {
+      state.menuCodeList = list
     }
   },
   getters: {
@@ -115,6 +119,7 @@ export default {
             commit('setUserId', data.userId)
             commit('setAccess', ['super_admin', 'admin'])
             commit('setHasGetInfo', true)
+            commit('setMenuCode', data.resources)
             data.access = ['super_admin', 'admin']
             resolve(data)
           }).catch(err => {
