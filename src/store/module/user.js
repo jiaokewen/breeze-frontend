@@ -11,6 +11,13 @@ import {
 } from '@/api/user'
 import { setToken, getToken } from '@/libs/util'
 
+const LOGIN_PAGE_NAME = 'login'
+const NO_ACCESS_NAME = 'error_403'
+const NOT_FOUND_NAME = 'error_404'
+const ERROR_NAME = 'error_500'
+const HOME_NAME = 'home'
+const SYS_PAGE = [LOGIN_PAGE_NAME, NO_ACCESS_NAME, NOT_FOUND_NAME, ERROR_NAME, HOME_NAME]
+
 export default {
   state: {
     username: '',
@@ -68,7 +75,7 @@ export default {
       state[to].unshift(msgItem)
     },
     setMenuCode (state, list) {
-      state.menuCodeList = list
+      state.menuCodeList = [...list, ...SYS_PAGE]
     }
   },
   getters: {

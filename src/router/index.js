@@ -14,8 +14,13 @@ const router = new Router({
 })
 const LOGIN_PAGE_NAME = 'login'
 const NO_ACCESS_NAME = 'error_403'
+const NOT_FOUND_NAME = 'error_404'
+const ERROR_NAME = 'error_500'
+const HOME_NAME = 'home'
+const SYS_PAGE = [LOGIN_PAGE_NAME, NO_ACCESS_NAME, NOT_FOUND_NAME, ERROR_NAME, HOME_NAME]
 
 const turnTo = (to, access, next) => {
+  debugger
   if (access.indexOf(to.name) > -1) next() // 有权限，可访问
   else next({ replace: true, name: 'error_403' }) // 无权限，重定向到401页面
 }
@@ -40,14 +45,13 @@ router.beforeEach((to, from, next) => {
       name: homeName // 跳转到homeName页
     })
   } else {
-    if (to.name === NO_ACCESS_NAME) {
-      next()
-    } else if (store.state.user.hasGetInfo) {
-      turnTo(to, store.state.user.access, next)
+    if (store.state.user.hasGetInfo) {
+      turnTo(to, store.state.user.menuCodeList, next)
     } else {
       store.dispatch('getUserInfo').then(user => {
         // 拉取用户信息，通过用户权限和跳转的页面的name来判断是否有权限访问;access必须是一个数组，如：['super_admin'] ['super_admin', 'admin']
-        turnTo(to, user.resources, next)
+        const access = [...user.resources, ...SYS_PAGE]
+        turnTo(to, access, next)
       }).catch(() => {
         setToken('')
         next({
