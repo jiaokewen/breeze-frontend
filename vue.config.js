@@ -49,6 +49,14 @@ module.exports = {
         pathRewrite: {
           '^/auth': '/'
         }
+      },
+      '/api': {
+        target: 'http://localhost:8080',
+        ws: true,
+        changOrigin: true,
+        pathRewrite: {
+          '^/api': '/'
+        }
       }
     }
   }

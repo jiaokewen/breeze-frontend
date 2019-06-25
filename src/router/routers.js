@@ -94,7 +94,7 @@ export default [
           icon: 'md-person',
           title: '用户管理'
         },
-        component: () => import('@/view/join-page.vue')
+        component: () => import('@/view/ucenter/user/Manage.vue')
       },
       {
         path: 'role_manage',
