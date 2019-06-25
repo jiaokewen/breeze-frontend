@@ -87,7 +87,7 @@ export default {
       return list
     },
     menuList () {
-      console.log(this.$store.state.user.menuCodeList)
+      console.log(this.$store.getters.menuList)
       let menu = this.filterMenu(this.$store.getters.menuList, this.$store.state.user.menuCodeList)
       return menu
     },

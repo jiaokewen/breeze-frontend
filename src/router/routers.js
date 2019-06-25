@@ -79,6 +79,44 @@ export default [
     ]
   },
   {
+    path: '/ucenter',
+    name: 'ucenter',
+    meta: {
+      icon: 'md-contacts',
+      title: '用户中心'
+    },
+    component: Main,
+    children: [
+      {
+        path: 'user_manage',
+        name: 'user_manage',
+        meta: {
+          icon: 'md-person',
+          title: '用户管理'
+        },
+        component: () => import('@/view/join-page.vue')
+      },
+      {
+        path: 'role_manage',
+        name: 'role_manage',
+        meta: {
+          icon: 'md-person',
+          title: '角色管理'
+        },
+        component: () => import('@/view/join-page.vue')
+      },
+      {
+        path: 'resources_manage',
+        name: 'resources_manage',
+        meta: {
+          icon: 'md-menu',
+          title: '资源管理'
+        },
+        component: () => import('@/view/join-page.vue')
+      }
+    ]
+  },
+  {
     path: '/message',
     name: 'message',
     component: Main,
@@ -394,7 +432,6 @@ export default [
         path: 'level_2_2',
         name: 'level_2_2',
         meta: {
-          access: ['super_admin'],
           icon: 'md-funnel',
           showAlways: true,
           title: '二级-2'

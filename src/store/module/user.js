@@ -1,3 +1,4 @@
+/* eslint-disable */
 import {
   login,
   logout,
@@ -95,7 +96,15 @@ export default {
           // commit('setToken', data)
           resolve(res)
         }).catch(err => {
-          reject(err)
+          if (err.response.status === 500) {
+            if (err.response.data.indexOf('ECONNREFUSED') > -1) {
+              reject('请求超时')
+            } else {
+              reject('服务器发生错误,请联系管理员')
+            }
+          } else {
+            reject('服务器发生错误,请联系管理员')
+          }
         })
       })
     },
@@ -124,10 +133,8 @@ export default {
             commit('setAvatar', 'https://avatars3.githubusercontent.com/u/31264070?s=400&u=79559505169ca8d39eda5d219e6dc770535d462c&v=4')
             commit('setUserName', data.nickName)
             commit('setUserId', data.userId)
-            commit('setAccess', ['super_admin', 'admin'])
             commit('setHasGetInfo', true)
             commit('setMenuCode', data.resources)
-            data.access = ['super_admin', 'admin']
             resolve(data)
           }).catch(err => {
             reject(err)
@@ -143,8 +150,8 @@ export default {
       commit('setAvatar', 'https://avatars3.githubusercontent.com/u/31264070?s=400&u=79559505169ca8d39eda5d219e6dc770535d462c&v=4')
       commit('setUserName', data.nickName)
       commit('setUserId', data.userId)
-      commit('setAccess', ['super_admin', 'admin'])
       commit('setHasGetInfo', true)
+      commit('setMenuCode', data.resources)
     },
     // 此方法用来获取未读消息条数，接口只返回数值，不返回消息列表
     getUnreadMessageCount ({ state, commit }) {

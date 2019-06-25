@@ -20,7 +20,6 @@ const HOME_NAME = 'home'
 const SYS_PAGE = [LOGIN_PAGE_NAME, NO_ACCESS_NAME, NOT_FOUND_NAME, ERROR_NAME, HOME_NAME]
 
 const turnTo = (to, access, next) => {
-  debugger
   if (access.indexOf(to.name) > -1) next() // 有权限，可访问
   else next({ replace: true, name: 'error_403' }) // 无权限，重定向到401页面
 }
@@ -28,9 +27,6 @@ const turnTo = (to, access, next) => {
 router.beforeEach((to, from, next) => {
   iView.LoadingBar.start()
   const token = getToken()
-  if (to.name === NO_ACCESS_NAME) {
-    next()
-  }
   if (!token && to.name !== LOGIN_PAGE_NAME) {
     // 未登录且要跳转的页面不是登录页
     next({
@@ -46,6 +42,8 @@ router.beforeEach((to, from, next) => {
     })
   } else {
     if (store.state.user.hasGetInfo) {
+      console.log(store.state.user.menuCodeList)
+      debugger
       turnTo(to, store.state.user.menuCodeList, next)
     } else {
       store.dispatch('getUserInfo').then(user => {
