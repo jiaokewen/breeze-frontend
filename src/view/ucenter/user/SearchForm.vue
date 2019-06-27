@@ -34,6 +34,9 @@ export default {
     doReset () {
       this.$refs.searchForm.resetFields()
       this.$emit('doSearch', {})
+    },
+    add () {
+      this.$emit('add')
     }
   }
 }
