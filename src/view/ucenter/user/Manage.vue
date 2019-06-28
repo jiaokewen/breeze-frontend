@@ -1,6 +1,6 @@
 <template>
 <div>
-  <Modal :styles="{top: '20px'}" v-model="modal1" title="用户信息" width="35" :mask-closable='false'>
+  <Modal :styles="{top: '10px'}" v-model="modal1" title="用户信息" width="35" :mask-closable='false'>
     <data-form ref="dataForm" :disabled="disabled" @onSave="save"></data-form>
     <div slot="footer">
       <Button @click="submit" type="info" v-if="btn" :loading="loading">提交</Button>
