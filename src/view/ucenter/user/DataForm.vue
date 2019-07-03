@@ -1,55 +1,97 @@
 <template>
-  <Form ref="dataForm" :model="dataModel" :rules="rules" :label-width="110">
-    <!-- 更换表单 -->
-    <FormItem label="用户名:" prop="loginName">
-      <Input
-        v-model="dataModel.loginName"
-        :disabled="disabled"
-        placeholder="请输入用户名"
-        style="width: 230px"
-      ></Input>
-    </FormItem>
-    <FormItem label="昵称:" prop="nickName">
-      <Input v-model="dataModel.nickName" placeholder="请输入昵称" style="width: 230px"></Input>
-    </FormItem>
-    <FormItem v-if="showPassword" label="密码:" prop="password">
-      <Input v-model="dataModel.password" placeholder="请输入密码" style="width: 230px"></Input>
-    </FormItem>
-    <FormItem label="邮箱:" prop="email">
-      <Input v-model="dataModel.email" placeholder="请输入邮箱" style="width: 230px"></Input>
-    </FormItem>
-    <FormItem label="电话号码:" prop="phoneNumber">
-      <Input v-model="dataModel.phoneNumber" placeholder="请输入电话号码" style="width: 230px"></Input>
-    </FormItem>
-    <FormItem label="性别:" prop="sex">
-      <RadioGroup v-model="dataModel.sex">
-        <Radio :label="1">男</Radio>
-        <Radio :label="2">女</Radio>
-      </RadioGroup>
-    </FormItem>
-    <FormItem label="年龄:" prop="age">
-      <Input v-model="dataModel.age" type="number" placeholder="请输入年龄" style="width: 230px"></Input>
-    </FormItem>
+  <Form ref="dataForm" :model="dataModel" :rules="rules" :label-width="90">
+    <Row>
+      <Col span="11">
+        <FormItem label="用户名:" prop="loginName">
+          <Input
+            v-model="dataModel.loginName"
+            :disabled="disabled"
+            placeholder="请输入用户名"
+            style="width: 200px"
+          ></Input>
+        </FormItem>
+      </Col>
+      <Col span="11">
+        <FormItem label="昵称:" prop="nickName">
+          <Input v-model="dataModel.nickName" placeholder="请输入昵称" style="width: 200px"></Input>
+        </FormItem>
+      </Col>
+    </Row>
+    <Row>
+      <Col span="11">
+        <FormItem label="密码:" prop="password">
+          <Input :disabled="disabled" type="password" v-model="dataModel.password" placeholder="请输入密码" style="width: 200px"></Input>
+        </FormItem>
+      </Col>
+      <Col span="11">
+        <FormItem label="邮箱:" prop="email">
+          <Input v-model="dataModel.email" placeholder="请输入邮箱" style="width: 200px"></Input>
+        </FormItem>
+      </Col>
+    </Row>
+    <Row>
+      <Col span="11">
+        <FormItem label="电话号码:" prop="phoneNumber">
+          <Input v-model="dataModel.phoneNumber" placeholder="请输入电话号码" style="width: 200px"></Input>
+        </FormItem>
+      </Col>
+      <Col span="11">
+        <FormItem label="年龄:" prop="age">
+          <Input v-model="dataModel.age" type="number" placeholder="请输入年龄" style="width: 200px"></Input>
+        </FormItem>
+      </Col>
+    </Row>
+    <Row>
+      <Col span="11">
+        <FormItem label="性别:" prop="sex">
+          <RadioGroup v-model="dataModel.sex">
+            <Radio :label="1">男</Radio>
+            <Radio :label="2">女</Radio>
+          </RadioGroup>
+        </FormItem>
+      </Col>
+      <Col span="11">
+        <FormItem label="状态:" prop="state">
+          <RadioGroup v-model="dataModel.state">
+            <Radio :label="1">启用</Radio>
+            <Radio :label="0">禁用</Radio>
+          </RadioGroup>
+        </FormItem>
+      </Col>
+    </Row>
     <FormItem label="头像:">
-      <div v-for="(item, index) in uploadList" :key="item" style="display: inline-block">
-      <div class="demo-upload-list" v-if="index === (uploadList.length - 1)">
-        <template v-if="item.status === 'finished'">
-          <img :src="item.url">
-          <div class="demo-upload-list-cover">
-            <Icon type="ios-eye-outline" @click.native="handleView(item.url)"></Icon>
-            <Icon type="ios-trash-outline" @click.native="handleRemove(item)"></Icon>
-          </div>
-        </template>
-        <template v-else>
-          <Progress v-if="item.showProgress" :percent="item.percentage" hide-info></Progress>
-        </template>
+      <div style="display: inline-block" v-if="editAvatar.status === 'finished'">
+        <div class="demo-upload-list">
+          <template>
+            <img :src="editAvatar.url" />
+            <div class="demo-upload-list-cover">
+              <Icon type="ios-eye-outline" @click.native="handleView(editAvatar.url)"></Icon>
+            </div>
+          </template>
+        </div>
       </div>
+      <div v-else v-for="(item, index) in uploadList" :key="index" style="display: inline-block">
+        <div
+          class="demo-upload-list"
+          v-if="(uploadList.length === 1 && index === 1) || index === (uploadList.length - 1)"
+        >
+          <template v-if="item.status === 'finished'">
+            <img :src="item.url" />
+            <div class="demo-upload-list-cover">
+              <Icon type="ios-eye-outline" @click.native="handleView(item.url)"></Icon>
+            </div>
+          </template>
+          <template v-else>
+            <Progress v-if="item.showProgress" :percent="item.percentage" hide-info></Progress>
+          </template>
+        </div>
       </div>
       <Upload
         ref="upload"
         :show-upload-list="false"
         :default-file-list="defaultList"
         :on-success="handleSuccess"
+        :on-error="handleError"
         :format="['jpg','jpeg','png']"
         :max-size="2048"
         :on-format-error="handleFormatError"
@@ -65,18 +107,13 @@
         </div>
       </Upload>
       <Modal title="查看大图" :styles="{top: '10px'}" v-model="visible">
-        <img
-          :src="imgUrl"
-          v-if="visible"
-          style="width: 100%"
-        >
+        <img :src="imgUrl" v-if="visible" style="width: 100%" />
       </Modal>
     </FormItem>
   </Form>
 </template>
 
 <script>
-// import TargetApi from '@/api/ContentType'
 /* eslint-disable */
 export default {
   props: ["disabled"],
@@ -90,9 +127,10 @@ export default {
         email: "",
         phoneNumber: "",
         sex: "",
-        age: ""
+        age: "",
+        avatarUrl: "",
+        state: ""
       },
-      showPassword: true,
       typeList: [],
       rules: {
         // 更换规则
@@ -105,13 +143,18 @@ export default {
             trigger: "blur"
           }
         ],
-        nickName: [{ required: true, message: "昵称不能为空", trigger: "blur" }]
+        nickName: [{ required: true, message: "昵称不能为空", trigger: "blur" }],
+        password: [{ required: true, message: "密码不能为空", trigger: "blur" }],
+        email: [{ required: true, message: "邮箱不能为空", trigger: "blur" },{type: 'email',message: "请输入正确的邮箱格式",trigger: "blur"}],
+        sex: [{ required: true, message: "请选择性别" }],
+        state: [{ required: true, message: "请选择状态" }],
+        phoneNumber: [{pattern: /^1[3456789]\d{9}$/, message: '请输入有效电话号码'}]
       },
-      defaultList: [
-      ],
+      defaultList: [],
       imgUrl: "",
       visible: false,
-      uploadList: []
+      uploadList: [],
+      editAvatar: {}
     };
   },
   mounted() {
@@ -131,7 +174,7 @@ export default {
       this.$emit("onCancel");
     },
     initData(initData) {
-      this.reSetForm(false);
+      this.reSetForm();
       this.dataModel.userId = initData.userId;
       this.dataModel.loginName = initData.loginName;
       this.dataModel.nickName = initData.nickName;
@@ -139,23 +182,32 @@ export default {
       this.dataModel.email = initData.email;
       this.dataModel.age = initData.age;
       this.dataModel.sex = initData.sex;
+      this.dataModel.state = initData.state;
+      this.dataModel.avatarUrl = initData.avatarUrl;
+      this.dataModel.password = initData.password;
+      this.editAvatar.status = "finished";
+      this.editAvatar.url = initData.avatarUrl;
     },
-    reSetForm(flag) {
-      this.showPassword = flag;
+    reSetForm() {
       this.$refs.dataForm.resetFields();
       this.dataModel.userId = "";
+      this.editAvatar = {};
     },
     handleView(url) {
       this.imgUrl = url;
       this.visible = true;
     },
-    handleRemove(file) {
+    handleRemove(index) {
       const fileList = this.$refs.upload.fileList;
-      this.$refs.upload.fileList.splice(fileList.indexOf(file), 1);
+      this.$refs.upload.fileList.splice(index, 1);
     },
     handleSuccess(res, file) {
       file.url = res.data;
       file.name = res.data;
+      this.dataModel.avatarUrl = res.data;
+    },
+    handleError() {
+      this.$Message.error(`头像上传失败`);
     },
     handleFormatError(file) {
       this.$Notice.warning({
@@ -173,13 +225,8 @@ export default {
       });
     },
     handleBeforeUpload() {
-      const check = this.uploadList.length < 5;
-      if (!check) {
-        this.$Notice.warning({
-          title: "Up to five pictures can be uploaded."
-        });
-      }
-      return check;
+      this.editAvatar = {};
+      return true;
     }
   }
 };

@@ -130,7 +130,7 @@ export default {
         try {
           getUserInfo(state.token).then(res => {
             const data = res.data
-            commit('setAvatar', 'https://avatars3.githubusercontent.com/u/31264070?s=400&u=79559505169ca8d39eda5d219e6dc770535d462c&v=4')
+            commit('setAvatar', data.avatarUrl)
             commit('setUserName', data.nickName)
             commit('setUserId', data.userId)
             commit('setHasGetInfo', true)
@@ -147,7 +147,7 @@ export default {
     // 获取用户相关信息
     setUserInfo ({ state, commit }, { res }) {
       const data = res.data
-      commit('setAvatar', 'https://avatars3.githubusercontent.com/u/31264070?s=400&u=79559505169ca8d39eda5d219e6dc770535d462c&v=4')
+      commit('setAvatar', data.avatarUrl)
       commit('setUserName', data.nickName)
       commit('setUserId', data.userId)
       commit('setHasGetInfo', true)
