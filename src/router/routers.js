@@ -103,7 +103,7 @@ export default [
           icon: 'md-person',
           title: '角色管理'
         },
-        component: () => import('@/view/join-page.vue')
+        component: () => import('@/view/ucenter/role/Manage.vue')
       },
       {
         path: 'resources_manage',
