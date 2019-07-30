@@ -59,7 +59,7 @@ export default {
               },
               on: {
                 click: () => {
-                  window.open(item.id)
+                  this.$emit('roleConfig', item)
                 }
               }
             }, '角色配置'),

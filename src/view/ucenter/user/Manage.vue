@@ -7,9 +7,24 @@
       <Button @click="close" type="info">关闭</Button>
     </div>
   </Modal>
+  <Modal :styles="{top: '30px'}" v-model="modal2" title="角色配置" width="520px" :mask-closable='false'>
+    <Transfer
+        :data="roleList"
+        :list-style="{width: '210px',height: '400px'}"
+        :target-keys="targetKeys"
+        :render-format="renderRoleName"
+        filterable
+        @on-change="onChange"
+        ></Transfer>
+    <div slot="footer">
+      <Button @click="saveUserRole" type="info" v-if="btn" :loading="loading">提交</Button>
+      <Button @click="() => modal2 = false" type="info">关闭</Button>
+    </div>
+  </Modal>
   <search-form @doSearch="doSearch" @add="add" class="search-form">
   </search-form>
-  <manage-table :data="data" :total="total" :currentPage="currentPage" @edit="edit" @pageChange="pageChange" @del="del" :loading="tableLoading">
+  <manage-table :data="data" :total="total" :currentPage="currentPage" @edit="edit" @pageChange="pageChange" @del="del" :loading="tableLoading"
+  @roleConfig="roleConfig">
   </manage-table>
 </div>
 </template>
@@ -19,7 +34,7 @@ import SearchForm from './SearchForm'
 import ManageTable from './Table'
 import DataForm from './DataForm'
 
-import Api from '@/api/ucenter/user'
+import api from '@/api/ucenter/user'
 /* eslint-disable */
 export default {
   data () {
@@ -34,7 +49,11 @@ export default {
       tableLoading: false,
       btn: true,
       disabled: false,
-      isEdit: true
+      isEdit: true,
+      modal2: false,
+      roleList: [],
+      targetKeys: [],
+      userId: ''
     }
   },
   mounted () {
@@ -43,7 +62,7 @@ export default {
   methods: {
     loadData () {
       this.tableLoading = true
-      Api.search(Object.assign(this.params,{
+      api.search(Object.assign(this.params,{
         page: this.currentPage,
         rows: this.pageSize
       })).then(resp => {
@@ -68,7 +87,7 @@ export default {
     save (item) {
       this.loading = true
       if (this.isEdit) {
-        Api.update(item).then(resp => {
+        api.update(item).then(resp => {
           if (resp.success) {
             this.$Notice.success({ title: '更新用户成功', desc: resp.message })
             this.loading = false
@@ -85,7 +104,7 @@ export default {
           this.modal1 = false
         })
       } else {
-        Api.add(item).then(resp => {
+        api.add(item).then(resp => {
           if (resp.success) {
             this.$Notice.success({ title: '新增用户成功', desc: resp.message })
             this.loading = false
@@ -122,7 +141,7 @@ export default {
         title: '删除确认',
         content: `确认要删除吗?`,
         onOk: () => {
-          Api.del(item.userId).then(resp => {
+          api.del(item.userId).then(resp => {
             if (resp.success) {
               this.$Notice.success({ title: '删除成功' })
               this.loadData()
@@ -143,6 +162,50 @@ export default {
     pageChange (page) {
       this.currentPage = page
       this.loadData()
+    },
+    roleConfig ({ userId }) {
+      this.modal2 = true
+      this.userId = userId
+      api.getRoleByUserId(userId).then(resp => {
+        if (resp.success) {
+          this.roleList = []
+          this.targetKeys = []
+          resp.data.allRole.forEach(item => {
+            this.roleList.push({key: item.roleId,label: item.roleName})
+          })
+          resp.data.userRole.forEach(item => {
+            this.targetKeys.push(item.roleId)
+          })
+        }
+      }).catch(err => {
+        this.$Message.error(`删除失败(${err.message || ''})`)
+      })
+    },
+    renderRoleName (item) {
+      return item.label
+    },
+    onChange (newTargetKeys) {
+      this.targetKeys = newTargetKeys
+    },
+    saveUserRole () {
+      this.loading = true
+      const params = {
+        userId: this.userId,
+        roleIds: this.targetKeys.join(',')
+      }
+      api.saveUserRole(params).then(resp => {
+        if (resp.success) {
+          this.$Notice.success({ title: resp.message })
+        } else {
+          this.$Notice.error({ title: '操作失败', desc: resp.message })
+        }
+        this.loading = false
+        this.modal2 = false
+      }).catch(err => {
+        this.$Message.error(`(${err.message || ''})`)
+        this.loading = false
+        this.modal2 = false
+      })
     }
   },
   components: {
