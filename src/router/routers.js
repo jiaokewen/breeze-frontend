@@ -112,7 +112,7 @@ export default [
           icon: 'md-menu',
           title: '资源管理'
         },
-        component: () => import('@/view/join-page.vue')
+        component: () => import('@/view/ucenter/resources/Manage.vue')
       }
     ]
   },
