@@ -1,4 +1,4 @@
-import { postJSON, putJSON, del } from '@/libs/http'
+import { postJSON, putJSON, del, get, post } from '@/libs/http'
 
 export default {
   search (param) {
@@ -12,5 +12,14 @@ export default {
   },
   del (id) {
     return del(`/api/breeze-user/sysRole/${id}`)
+  },
+  getResourcesTree () {
+    return get(`/api/breeze-user/sysResources/getTree`)
+  },
+  selectByRoleId (roleId) {
+    return get(`/api/breeze-user/sysResources/roleId/${roleId}`)
+  },
+  saveRoleResources (params) {
+    return post('/api/breeze-user/sysRole/saveRoleResources', params)
   }
 }

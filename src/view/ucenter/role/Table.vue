@@ -39,6 +39,20 @@ export default {
           return h('div', [
             h('Button', {
               props: {
+                type: 'success',
+                size: 'small'
+              },
+              style: {
+                marginRight: '5px'
+              },
+              on: {
+                click: () => {
+                  this.$emit('permConfig', item)
+                }
+              }
+            }, '权限配置'),
+            h('Button', {
+              props: {
                 type: 'primary',
                 size: 'small',
                 icon: 'md-create'

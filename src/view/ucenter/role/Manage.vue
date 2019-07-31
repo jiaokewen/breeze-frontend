@@ -9,8 +9,15 @@
   </Modal>
   <search-form @doSearch="doSearch" @add="add" class="search-form">
   </search-form>
-  <manage-table :data="data" :total="total" :currentPage="currentPage" @edit="edit" @pageChange="pageChange" @del="del" :loading="tableLoading">
+  <manage-table :data="data" :total="total" :currentPage="currentPage" @permConfig="permConfig" @edit="edit" @pageChange="pageChange" @del="del" :loading="tableLoading">
   </manage-table>
+  <Modal :styles="{top: '30px'}" v-model="modal2" title="权限配置" width="520px" :mask-closable='false'>
+    <Tree :data="resourcesData" show-checkbox multiple style="height: 400px"></Tree>
+    <div slot="footer">
+      <Button @click="savePerm" type="info" v-if="btn" :loading="loading">提交</Button>
+      <Button @click="() => modal2 = false" type="info">关闭</Button>
+    </div>
+  </Modal>
 </div>
 </template>
 
@@ -19,7 +26,7 @@ import SearchForm from './SearchForm'
 import ManageTable from './Table'
 import DataForm from './DataForm'
 
-import Api from '@/api/ucenter/role'
+import api from '@/api/ucenter/role'
 /* eslint-disable */
 export default {
   data () {
@@ -34,7 +41,10 @@ export default {
       tableLoading: false,
       btn: true,
       disabled: false,
-      isEdit: true
+      isEdit: true,
+      modal2: false,
+      resourcesData: [],
+      roleId: ''
     }
   },
   mounted () {
@@ -43,7 +53,7 @@ export default {
   methods: {
     loadData () {
       this.tableLoading = true
-      Api.search(Object.assign(this.params,{
+      api.search(Object.assign(this.params,{
         page: this.currentPage,
         rows: this.pageSize
       })).then(resp => {
@@ -68,7 +78,7 @@ export default {
     save (item) {
       this.loading = true
       if (this.isEdit) {
-        Api.update(item).then(resp => {
+        api.update(item).then(resp => {
           if (resp.success) {
             this.$Notice.success({ title: '更新角色成功', desc: resp.message })
             this.loading = false
@@ -85,7 +95,7 @@ export default {
           this.modal1 = false
         })
       } else {
-        Api.add(item).then(resp => {
+        api.add(item).then(resp => {
           if (resp.success) {
             this.$Notice.success({ title: '新增角色成功', desc: resp.message })
             this.loading = false
@@ -122,7 +132,7 @@ export default {
         title: '删除确认',
         content: `确认要删除吗?`,
         onOk: () => {
-          Api.del(item.roleId).then(resp => {
+          api.del(item.roleId).then(resp => {
             if (resp.success) {
               this.$Notice.success({ title: '删除成功' })
               this.loadData()
@@ -143,6 +153,89 @@ export default {
     pageChange (page) {
       this.currentPage = page
       this.loadData()
+    },
+    savePerm () {
+      this.loading = true
+      let ids = []
+      this.getCheckIds(null, ids)
+      const params = {
+        roleId: this.roleId,
+        resourcesIds: ids.join(',')
+      }
+      api.saveRoleResources(params).then(resp => {
+        if (resp.success) {
+          this.$Notice.success({ title: resp.message })
+        } else {
+          this.$Notice.error({ title: '操作失败', desc: resp.message })
+        }
+        this.loading = false
+        this.modal2 = false
+      }).catch(err => {
+        this.$Message.error(`(${err.message || ''})`)
+        this.loading = false
+        this.modal2 = false
+      })
+    },
+    permConfig ({roleId}) {
+      this.modal2 = true
+      this.roleId = roleId
+      api.getResourcesTree().then(resp => {
+        if (resp.success) {
+          api.selectByRoleId(roleId).then(resp1 => {
+            if (resp1.success) {
+              let data = resp.data
+              this.treeData(data)
+              resp1.data.forEach(item => {
+                this.addTreeSelect(item.resourcesId,data)
+              })
+              this.resourcesData = data
+            } else {
+              this.$Message.error(`(${resp1.message || ''})`)
+              this.resourcesData = []
+            }
+          }).catch(err => {
+            this.$Message.error(`(${err.message || ''})`)
+            this.resourcesData = []
+          })
+        } else {
+          this.$Message.error(`(${resp.message || ''})`)
+          this.resourcesData = []
+        }
+      }).catch(err => {
+        this.$Message.error(`(${err.message || ''})`)
+        this.resourcesData = []
+      })
+    },
+    treeData (data) {
+      data.forEach(item => {
+        item.title = item.resourcesName
+        if (item.children.length > 0) {
+          item.expand = true
+          this.treeData(item.children)
+        }
+      })
+    },
+    addTreeSelect (resourcesId,data) {
+      for (let item of data) {
+        if (item.resourcesId === resourcesId) {
+          item.checked = true
+          return
+        }
+        if (item.children.length > 0) {
+          this.addTreeSelect(resourcesId,item.children)
+        }
+      }
+    },
+    getCheckIds (data, ids) {
+      if (!data) data = this.resourcesData
+      data.forEach(item => {
+        if (item.checked) {
+          ids.push(item.resourcesId)
+        }
+        if (item.children.length > 0) {
+          this.getCheckIds(item.children, ids)
+        }
+      })
     }
   },
   components: {
@@ -150,3 +243,8 @@ export default {
   }
 }
 </script>
+<style lang="less">
+  .ivu-tree {
+    overflow: auto
+  }
+</style>
