@@ -46,5 +46,6 @@ export default {
   ucenter: '用户中心',
   user_manage: '用户管理',
   role_manage: '角色管理',
-  resources_manage: '资源管理'
+  resources_manage: '资源管理',
+  blog_manage: '博客管理'
 }

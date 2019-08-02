@@ -137,6 +137,25 @@ export default [
     ]
   },
   {
+    path: '/blog',
+    name: 'blog_manage',
+    component: Main,
+    meta: {
+      hideInBread: true
+    },
+    children: [
+      {
+        path: 'blog_manage',
+        name: 'blog_manage',
+        meta: {
+          icon: 'ios-book',
+          title: '博客管理'
+        },
+        component: () => import('@/view/blog/Manage.vue')
+      }
+    ]
+  },
+  {
     path: '/components',
     name: 'components',
     meta: {
